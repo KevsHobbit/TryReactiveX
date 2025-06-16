@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
+    <link rel="icon" href="https://brandeps.com/logo-download/R/Reactivex-logo-vector-01.svg" type="image/svg+xml">
+
     <meta charset="UTF-8">
     <title>Try ReactiveX</title>
     <style>
@@ -137,19 +140,13 @@
             <div class="examples">
                 <h3>Exercícios Básicos:</h3>
                 <button class="example-btn" onclick="loadExample(1)">1. Hello World RxJS</button>
-                <button class="example-btn" onclick="loadExample(2)">2. Observer Completo</button>
+                <button class="example-btn" onclick="loadExample(2)">2. Ainda decidindo...</button>
                 <button class="example-btn" onclick="loadExample(3)">3. Coordenadas do Clique</button>
             </div>
         </div>
         
         <div class="playground">
-            <textarea id="editor">// Digite seu código RxJS aqui
-const { interval } = rxjs;
-const { take } = rxjs.operators;
-
-interval(1000)
-  .pipe(take(3))
-  .subscribe(val => console.log(val));</textarea>
+            <textarea id="editor">// Digite seu código RxJS aqui</textarea>
             <button id="run-btn" onclick="runCode()">Executar</button>
             
             <h3>Saída:</h3>
@@ -192,23 +189,7 @@ of('Hello World!').subscribe({
   next: val => console.log(val),
   complete: () => console.log('Completo!')
 });`,
-                
-                `// 2. Observer Completo
-const { Observable } = rxjs;
-
-const observable = new Observable(observer => {
-  observer.next('Primeiro valor');
-  setTimeout(() => observer.next('Valor após 1 segundo'), 1000);
-  setTimeout(() => observer.complete(), 1500);
-});
-
-const observer = {
-  next: x => console.log('Recebido: ' + x),
-  error: err => console.error('Erro: ' + err),
-  complete: () => console.log('Finalizado')
-};
-
-observable.subscribe(observer);`,
+                ,
                 
                 `// 3. Coordenadas do Clique
 const { fromEvent } = rxjs;
@@ -230,9 +211,31 @@ fromEvent(document, 'click').pipe(
     e 
     <a href="https://github.com/mitsiki" target="_blank" style="color: inherit; text-decoration: none;">@mitsiki</a>
     |
-    <a href="sobre.html" style="color: inherit; text-decoration: none;">Sobre o Projeto</a>
+    <a href="#" onclick="abrirModal()" style="color: inherit; text-decoration: none;">Sobre o Projeto</a>
   </p>
 </footer>
+
+
+    <div id="sobre-modal" style="display: none; position: fixed; top: 0; left: 0; 
+  width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); 
+  backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: #2d2d2d; color: #e0e0e0; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; position: relative;">
+    <button onclick="fecharModal()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer;">×</button>
+    <h2 style="margin-top: 0; color: #e01b84;">Sobre o Projeto</h2>
+    <p>Esse playground foi feito para testar exemplos de RxJS de forma prática e rápida, sem precisar configurar um ambiente completo.</p>
+    <p>Criação colaborativa entre <a href="https://github.com/KevsHobbit" target="_blank" style="color: #e0e0e0;">@KevsHobbit</a> e <a href="https://github.com/mitsiki" target="_blank" style="color: #e0e0e0;">@mitsiki</a>.</p>
+  </div>
+</div>
+
+<script>
+  function abrirModal() {
+    document.getElementById('sobre-modal').style.display = 'flex';
+  }
+
+  function fecharModal() {
+    document.getElementById('sobre-modal').style.display = 'none';
+  }
+</script>
 
 </body>
 </html>
