@@ -108,3 +108,7 @@ header {
     font-weight: bold;
 }
 
+#editor {
+    resize: vertical; 
+    overflow: auto; 
+}

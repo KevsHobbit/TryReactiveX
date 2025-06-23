@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
     <link rel="icon" href="https://brandeps.com/logo-download/R/Reactivex-logo-vector-01.svg" type="image/svg+xml">
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Try ReactiveX</title>
     <style>
-
         :root {
             --primary: #e01b84;
             --bg: #1e1e1e;
@@ -35,7 +33,6 @@
             font-size: 2.2rem;
         }
 
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
@@ -47,17 +44,15 @@
 
         .container {
             display: flex;
+            flex-wrap: wrap; /* Permite que os itens quebrem a linha em telas menores */
             gap: 40px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        .intro {
+        .intro, .playground {
             flex: 1;
-        }
-
-        .playground {
-            flex: 1;
+            min-width: 300px; /* Garante que não fiquem muito estreitos em telas pequenas */
         }
 
         h1 {
@@ -80,16 +75,20 @@
             border-radius: 4px;
             cursor: pointer;
             margin: 5px 0;
+            transition: background-color 0.3s ease; /* Efeito de transição ao passar o mouse */
+        }
+        button:hover {
+            background-color: #f04b9e; /* Cor um pouco mais clara ao passar o mouse */
         }
 
+
+        /* AJUSTES NO EDITOR */
         #editor {
             width: 100%;
-            height: 200px;
+            height: 250px; /* Definindo uma altura fixa para o editor, para o Monaco saber onde renderizar */
             background: var(--editor-bg);
             color: var(--text);
             border: 1px solid #444;
-            padding: 10px;
-            font-family: monospace;
             margin-bottom: 10px;
         }
 
@@ -100,6 +99,8 @@
             min-height: 100px;
             font-family: monospace;
             white-space: pre-wrap;
+            overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
+            max-height: 300px; /* Limita a altura da saída */
         }
 
         .examples {
@@ -112,6 +113,46 @@
             text-align: left;
             background: #333;
             margin: 5px 0;
+            transition: background-color 0.3s ease;
+        }
+        .example-btn:hover {
+            background-color: #444;
+        }
+
+        /* Estilos para o modal */
+        #sobre-modal {
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(4px); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center;
+        }
+
+        #sobre-modal > div {
+            background: #2d2d2d; 
+            color: #e0e0e0; 
+            padding: 30px; 
+            border-radius: 8px; 
+            max-width: 500px; 
+            width: 90%; 
+            position: relative;
+        }
+
+        #sobre-modal button {
+            position: absolute; 
+            top: 10px; 
+            right: 15px; 
+            background: none; 
+            border: none; 
+            color: #ccc; 
+            font-size: 20px; 
+            cursor: pointer;
         }
     </style>
 </head>
@@ -139,103 +180,63 @@
 
             <div class="examples">
                 <h3>Exercícios Básicos:</h3>
-                <button class="example-btn" onclick="loadExample(1)">1. Hello World RxJS</button>
-                <button class="example-btn" onclick="loadExample(2)">2. Ainda decidindo...</button>
-                <button class="example-btn" onclick="loadExample(3)">3. Coordenadas do Clique</button>
+                <button class="example-btn" data-example-num="1">1. Hello World RxJS</button>
+                <button class="example-btn" data-example-num="2">2. Atraso Simples com Timer</button>
+                <button class="example-btn" data-example-num="3">3. Coordenadas do Clique</button>
+                <button class="example-btn" data-example-num="4">4. Transformação de Números (Desafio)</button>
             </div>
         </div>
         
         <div class="playground">
-            <textarea id="editor">// Digite seu código RxJS aqui</textarea>
-            <button id="run-btn" onclick="runCode()">Executar</button>
+            <div id="editor"></div> 
+            <button id="run-btn">Executar</button>
             
             <h3>Saída:</h3>
             <div id="output"></div>
         </div>
     </div>
 
+    <!-- Carrega a biblioteca RxJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/7.8.0/rxjs.umd.min.js"></script>
-    <script>
-        // Armazena o console.log original
-        const originalConsoleLog = console.log;
-        
-        function runCode() {
-            const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = '';
-            
-            // Substitui console.log para capturar a saída
-            console.log = function(message) {
-                outputDiv.innerHTML += message + '\n';
-                originalConsoleLog.apply(console, arguments);
-            };
-            
-            try {
-                // Executa o código
-                eval(document.getElementById('editor').value);
-            } catch (error) {
-                outputDiv.innerHTML = 'Erro: ' + error.message;
-            } finally {
-                // Restaura o console.log original
-                console.log = originalConsoleLog;
-            }
-        }
-        
-        function loadExample(num) {
-            const examples = [
-                `// 1. Hello World RxJS
-const { of } = rxjs;
+    <!-- Carrega o RequireJS (necessário para o Monaco Editor) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 
-of('Hello World!').subscribe({
-  next: val => console.log(val),
-  complete: () => console.log('Completo!')
-});`,
-                ,
-                
-                `// 3. Coordenadas do Clique
-const { fromEvent } = rxjs;
-const { map } = rxjs.operators;
+    <!-- Referencia o código JavaScript principal -->
+    <script src="app.js"></script>
 
-fromEvent(document, 'click').pipe(
-  map(ev => \`Clicado em: \${ev.clientX}, \${ev.clientY}\`)
-).subscribe(console.log);`,
-            ];
-            
-            document.getElementById('editor').value = examples[num - 1];
-        }
-    </script>
-
-    <footer style="background-color: #1e1e1e;;; color: #ccc; text-align: center; padding: 50px; font-family: sans-serif;">
-  <p style="margin: 0;">
-    Feito por 
-    <a href="https://github.com/KevsHobbit" target="_blank" style="color: inherit; text-decoration: none;">@KevsHobbit</a>
-    e 
-    <a href="https://github.com/mitsiki" target="_blank" style="color: inherit; text-decoration: none;">@mitsiki</a>
-    |
-    <a href="#" onclick="abrirModal()" style="color: inherit; text-decoration: none;">Sobre o Projeto</a>
-  </p>
-</footer>
-
+    <footer style="background-color: #1e1e1e; color: #ccc; text-align: center; padding: 50px; font-family: sans-serif;">
+        <p style="margin: 0;">
+            Feito por 
+            <a href="https://github.com/kevyngandolfi" target="_blank" style="color: inherit; text-decoration: none;">@kevyngandolfi</a>
+            e 
+            <a href="https://github.com/masthps" target="_blank" style="color: inherit; text-decoration: none;">@masthps</a>
+            |
+            <a href="#" onclick="abrirModal()" style="color: inherit; text-decoration: none;">Sobre o Projeto</a>
+        </p>
+    </footer>
 
     <div id="sobre-modal" style="display: none; position: fixed; top: 0; left: 0; 
-  width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); 
-  backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
-  <div style="background: #2d2d2d; color: #e0e0e0; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; position: relative;">
-    <button onclick="fecharModal()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer;">×</button>
-    <h2 style="margin-top: 0; color: #e01b84;">Sobre o Projeto</h2>
-    <p>Esse playground foi feito para testar exemplos de RxJS de forma prática e rápida, sem precisar configurar um ambiente completo.</p>
-    <p>Criação colaborativa entre <a href="https://github.com/KevsHobbit" target="_blank" style="color: #e0e0e0;">@KevsHobbit</a> e <a href="https://github.com/mitsiki" target="_blank" style="color: #e0e0e0;">@mitsiki</a>.</p>
-  </div>
-</div>
+      width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); 
+      backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;">
+      <div style="background: #2d2d2d; color: #e0e0e0; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%; position: relative;">
+        <button onclick="fecharModal()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; color: #ccc; font-size: 20px; cursor: pointer;">×</button>
+        <h2 style="margin-top: 0; color: #e01b84;">Sobre o Projeto</h2>
+        <p> <br>Este playground foi feito para testar exemplos de RxJS de forma prática e rápida, sem precisar configurar um ambiente completo.<br>
+            <br>Inspirado no conceito do Try Clojure, nosso objetivo é fornecer um espaço educativo e acessível para que estudantes e entusiastas do desenvolvimento possam explorar e experimentar a programação reativa com RxJS diretamente no navegador. <br>
+            <br>Este é um projeto acadêmico, desenvolvido por iniciantes na matéria de PALM, focado em oferecer uma ferramenta simples, mas eficaz, para o aprendizado prático. Ele serve como uma prova de conceito de como bibliotecas poderosas como o RxJS podem ser exploradas em um ambiente controlado e interativo. Nosso intuito é demonstrar a flexibilidade e o poder do RxJS, facilitando a compreensão de seus operadores e a manipulação de fluxos de dados assíncronos. <br></p>
+        <p>Criação colaborativa entre <a href="https://github.com/kevyngandolfi" target="_blank" style="color: #e0e0e0;">@kevyngandolfi</a> e <a href="https://github.com/masthps" target="_blank" style="color: #e0e0e0;">@masthps</a>.</p>
+      </div>
+    </div>
 
-<script>
-  function abrirModal() {
-    document.getElementById('sobre-modal').style.display = 'flex';
-  }
+    <!-- Funções do modal -->
+    <script>
+      function abrirModal() {
+        document.getElementById('sobre-modal').style.display = 'flex';
+      }
 
-  function fecharModal() {
-    document.getElementById('sobre-modal').style.display = 'none';
-  }
-</script>
-
+      function fecharModal() {
+        document.getElementById('sobre-modal').style.display = 'none';
+      }
+    </script>
 </body>
 </html>
