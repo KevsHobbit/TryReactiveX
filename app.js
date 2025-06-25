@@ -113,9 +113,7 @@ const numeros = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 console.log('Processando números...');
 
 from(numeros).pipe(
-  // Filtra apenas os números pares
   filter(num => num % 2 === 0),
-  // Multiplica cada número par por 10
   map(par => par * 10)
 ).subscribe({
   next: resultado => console.log(\`Número par x 10: \${resultado}\`),
